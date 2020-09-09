@@ -28,7 +28,8 @@
             android:hint="@string/user_name_hint"
             android:imeOptions="flagNoExtractUi"
             android:inputType="textPersonName"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:text="@{viewmodel.size.toString()}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/users_list"
