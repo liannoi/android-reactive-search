@@ -14,6 +14,7 @@ class UsersFragment : Fragment() {
 
     private val viewModel: UsersViewModel by viewModels()
     private lateinit var viewDataBinding: FragmentUsersBinding
+    private lateinit var listAdapter: UsersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,5 +32,15 @@ class UsersFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
+        setupListAdapter()
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Helpers
+    ///////////////////////////////////////////////////////////////////////////
+
+    private fun setupListAdapter() {
+        listAdapter = UsersAdapter(viewDataBinding.viewmodel ?: return)
+        viewDataBinding.usersList.adapter = listAdapter
     }
 }
