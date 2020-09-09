@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/main_fragment_dest">
+    app:startDestination="@id/users_fragment_dest">
 
     <fragment
-        android:id="@+id/main_fragment_dest"
-        android:name="org.itstep.liannoi.reactivesearch.presentation.main.MainFragment"
-        android:label="Main Fragment"
-        tools:layout="@layout/fragment_main" />
+        android:id="@+id/users_fragment_dest"
+        android:name="org.itstep.liannoi.reactivesearch.presentation.users.UsersFragment"
+        android:label="Users Fragment"
+        tools:layout="@layout/fragment_users" />
 
 </navigation>

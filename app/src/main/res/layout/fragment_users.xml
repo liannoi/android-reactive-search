@@ -6,7 +6,7 @@
 
         <variable
             name="viewmodel"
-            type="org.itstep.liannoi.reactivesearch.presentation.main.MainViewModel" />
+            type="org.itstep.liannoi.reactivesearch.presentation.users.UsersViewModel" />
 
     </data>
 
