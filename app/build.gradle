@@ -21,14 +21,13 @@ android {
         debug {
             minifyEnabled false
             testCoverageEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
 
         release {
             minifyEnabled true
-            useProguard true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
@@ -39,8 +38,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 
     kotlinOptions {
@@ -63,14 +62,20 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
+
+    // Reactive
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxkotlin:$rxKotlinVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
     implementation "com.jakewharton.rxbinding4:rxbinding:$rxBindingVersion"
     implementation "com.jakewharton.rxbinding4:rxbinding-core:$rxBindingVersion"
     implementation "com.jakewharton.rxbinding4:rxbinding-appcompat:$rxBindingVersion"
-    implementation "com.google.dagger:hilt-android:$hiltVersion"
+
+    // Hilt
+    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltAndroidXVersion"
 
     // Kotlin
     implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
