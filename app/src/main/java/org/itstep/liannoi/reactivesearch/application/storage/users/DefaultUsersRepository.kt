@@ -19,23 +19,23 @@ class DefaultUsersRepository constructor(
 
     private val disposable: CompositeDisposable = CompositeDisposable()
 
-    override fun create(request: CreateCommand, handler: CreateCommand.Handler) {
+    override fun create(request: CreateCommand, notification: CreateCommand.Notification) {
         Completable.fromAction { usersLocalDataSource.create(request.user) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { handler.onUserCreatedSuccess() },
-                { handler.onUserCreatedError(it) }
+                { notification.onUserCreatedSuccess() },
+                { notification.onUserCreatedError(it) }
             ).addTo(disposable)
     }
 
-    override fun getAll(request: ListQuery, handler: ListQuery.Handler) {
+    override fun getAll(request: ListQuery, notification: ListQuery.Notification) {
         usersLocalDataSource.getAll()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { handler.onUsersFetchedSuccess(it) },
-                { handler.onUsersFetchedError(it) }
+                { notification.onUsersFetchedSuccess(it) },
+                { notification.onUsersFetchedError(it) }
             ).addTo(disposable)
     }
 

@@ -4,5 +4,5 @@ import org.itstep.liannoi.reactivesearch.application.storage.core.SampleDataSeed
 
 interface Seeder {
 
-    fun seedAll(handler: SampleDataSeeder.Handler)
+    fun seedAll(notification: SampleDataSeeder.Notification)
 }

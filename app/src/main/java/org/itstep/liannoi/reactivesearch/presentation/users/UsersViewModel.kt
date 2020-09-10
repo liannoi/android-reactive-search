@@ -55,9 +55,9 @@ class UsersViewModel @ViewModelInject constructor(
     // Nested classes
     ///////////////////////////////////////////////////////////////////////////
 
-    inner class FilteringQueryHandler constructor(
+    private inner class FilteringQueryHandler constructor(
         private val firstName: String
-    ) : ListQuery.Handler {
+    ) : ListQuery.NotificationHandler() {
 
         override fun onUsersFetchedSuccess(users: List<User>) {
             if (firstName.isEmpty()) {
@@ -65,6 +65,14 @@ class UsersViewModel @ViewModelInject constructor(
                 return
             }
 
+            filter(users)
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // Helpers
+        ///////////////////////////////////////////////////////////////////////////
+
+        private fun filter(users: List<User>) {
             Flowable.fromArray(users)
                 .map { list: List<User> -> list.filter { it.firstName.startsWith(firstName) } }
                 .subscribeOn(Schedulers.io())
@@ -72,24 +80,16 @@ class UsersViewModel @ViewModelInject constructor(
                 .subscribe { _users.value = it }
                 .addTo(disposable)
         }
-
-        override fun onUsersFetchedError(throwable: Throwable) {
-            /* no-op */
-        }
     }
 
-    private inner class ListQueryHandler : ListQuery.Handler {
+    private inner class ListQueryHandler : ListQuery.NotificationHandler() {
 
         override fun onUsersFetchedSuccess(users: List<User>) {
             this@UsersViewModel._users.postValue(users)
         }
-
-        override fun onUsersFetchedError(throwable: Throwable) {
-            /* no-op */
-        }
     }
 
-    private inner class SampleDataSeederHandler : SampleDataSeeder.Handler {
+    private inner class SampleDataSeederHandler : SampleDataSeeder.NotificationHandler() {
 
         override fun onUsersSeedingSuccess() {
             getAll()
@@ -97,10 +97,6 @@ class UsersViewModel @ViewModelInject constructor(
 
         override fun onUsersSeedingSkip() {
             getAll()
-        }
-
-        override fun onUsersSeedingError(throwable: Throwable) {
-            /* no-op */
         }
 
         ///////////////////////////////////////////////////////////////////////////

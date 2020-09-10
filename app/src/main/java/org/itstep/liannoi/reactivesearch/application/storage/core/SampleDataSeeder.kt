@@ -15,21 +15,21 @@ class SampleDataSeeder constructor(
     private val disposable: CompositeDisposable
 ) : Seeder {
 
-    override fun seedAll(handler: Handler) {
-        usersRepository.getAll(ListQuery(), ListQueryHandler(handler))
+    override fun seedAll(notification: Notification) {
+        usersRepository.getAll(ListQuery(), ListQueryHandler(notification))
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Helpers
     ///////////////////////////////////////////////////////////////////////////
 
-    private fun seedUsers(handler: Handler) {
+    private fun seedUsers(notification: Notification) {
         Flowable.range(0, 1000)
             .map { User(firstName = UUID.randomUUID().toString()) }
-            .map { usersRepository.create(CreateCommand(it), CreateCommandHandler()) }
+            .map { usersRepository.create(CreateCommand(it), CreateCommand.NotificationHandler()) }
             .subscribe(
-                { handler.onUsersSeedingSuccess() },
-                { handler.onUsersSeedingError(it) }
+                { notification.onUsersSeedingSuccess() },
+                { notification.onUsersSeedingError(it) }
             ).addTo(disposable)
     }
 
@@ -37,7 +37,7 @@ class SampleDataSeeder constructor(
     // Nested members
     ///////////////////////////////////////////////////////////////////////////
 
-    interface Handler {
+    interface Notification {
 
         fun onUsersSeedingSuccess()
 
@@ -46,32 +46,32 @@ class SampleDataSeeder constructor(
         fun onUsersSeedingSkip()
     }
 
-    private class CreateCommandHandler : CreateCommand.Handler {
+    open class NotificationHandler : Notification {
 
-        override fun onUserCreatedSuccess() {
+        override fun onUsersSeedingSuccess() {
             /* no-op */
         }
 
-        override fun onUserCreatedError(throwable: Throwable) {
+        override fun onUsersSeedingError(throwable: Throwable) {
+            /* no-op */
+        }
+
+        override fun onUsersSeedingSkip() {
             /* no-op */
         }
     }
 
     private inner class ListQueryHandler constructor(
-        private val handler: Handler
-    ) : ListQuery.Handler {
+        private val notification: Notification
+    ) : ListQuery.NotificationHandler() {
 
         override fun onUsersFetchedSuccess(users: List<User>) {
             if (users.isNotEmpty()) {
-                handler.onUsersSeedingSkip()
+                notification.onUsersSeedingSkip()
                 return
             }
 
-            seedUsers(handler)
-        }
-
-        override fun onUsersFetchedError(throwable: Throwable) {
-            /* no-op */
+            seedUsers(notification)
         }
     }
 }
