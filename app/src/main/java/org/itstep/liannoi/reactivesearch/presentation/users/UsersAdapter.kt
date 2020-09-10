@@ -23,7 +23,7 @@ class UsersAdapter constructor(
     ///////////////////////////////////////////////////////////////////////////
 
     class ViewHolder private constructor(
-        val binding: ItemUserBinding
+        private val binding: ItemUserBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(viewModel: UsersViewModel, user: User) {

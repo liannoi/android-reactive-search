@@ -1,20 +1,21 @@
 package org.itstep.liannoi.reactivesearch.presentation.users
 
-import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import org.itstep.liannoi.reactivesearch.application.common.interfaces.UsersRepository
 import org.itstep.liannoi.reactivesearch.application.storage.core.SampleDataSeeder
 import org.itstep.liannoi.reactivesearch.application.storage.users.models.User
 import org.itstep.liannoi.reactivesearch.application.storage.users.queries.ListQuery
 
 class UsersViewModel @ViewModelInject constructor(
-    private val usersRepository: UsersRepository,
-    @Assisted private val savedStateHandle: SavedStateHandle
+    private val usersRepository: UsersRepository
 ) : ViewModel() {
 
     private val disposable: CompositeDisposable = CompositeDisposable()
@@ -24,6 +25,10 @@ class UsersViewModel @ViewModelInject constructor(
 
     init {
         SampleDataSeeder(usersRepository, disposable).seedAll(SampleDataSeederHandler())
+    }
+
+    fun filter(firstName: String) {
+        usersRepository.getAll(ListQuery(), FilteringQueryHandler(firstName))
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -38,6 +43,10 @@ class UsersViewModel @ViewModelInject constructor(
         usersRepository.destroy()
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Companion object
+    ///////////////////////////////////////////////////////////////////////////
+
     companion object {
         private var TAG: String = this::class.simpleName!!
     }
@@ -45,6 +54,29 @@ class UsersViewModel @ViewModelInject constructor(
     ///////////////////////////////////////////////////////////////////////////
     // Nested classes
     ///////////////////////////////////////////////////////////////////////////
+
+    inner class FilteringQueryHandler constructor(
+        private val firstName: String
+    ) : ListQuery.Handler {
+
+        override fun onUsersFetchedSuccess(users: List<User>) {
+            if (firstName.isEmpty()) {
+                _users.value = users
+                return
+            }
+
+            Flowable.fromArray(users)
+                .map { list: List<User> -> list.filter { it.firstName.startsWith(firstName) } }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { _users.value = it }
+                .addTo(disposable)
+        }
+
+        override fun onUsersFetchedError(throwable: Throwable) {
+            /* no-op */
+        }
+    }
 
     private inner class ListQueryHandler : ListQuery.Handler {
 

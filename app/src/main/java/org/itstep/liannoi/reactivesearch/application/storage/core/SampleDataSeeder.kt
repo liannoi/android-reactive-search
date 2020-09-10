@@ -27,8 +27,10 @@ class SampleDataSeeder constructor(
         Flowable.range(0, 1000)
             .map { User(firstName = UUID.randomUUID().toString()) }
             .map { usersRepository.create(CreateCommand(it), CreateCommandHandler()) }
-            .subscribe { handler.onUsersSeedingSuccess() }
-            .addTo(disposable)
+            .subscribe(
+                { handler.onUsersSeedingSuccess() },
+                { handler.onUsersSeedingError(it) }
+            ).addTo(disposable)
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -69,7 +71,7 @@ class SampleDataSeeder constructor(
         }
 
         override fun onUsersFetchedError(throwable: Throwable) {
-            TODO("Not yet implemented")
+            /* no-op */
         }
     }
 }
